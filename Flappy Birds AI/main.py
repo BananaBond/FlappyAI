@@ -178,13 +178,13 @@ def draw_window(win, birds, pipes, base, score):
 
     base.draw(win)
 
-    text = STAT_FONT.render("SCORE " + str(score), 1, (255, 255, 255))
+    text = STAT_FONT.render("SCORE  " + str(score), 1, (255, 255, 255))
     win.blit(text, (WIN_WIDTH - 10 - text.get_width(), 10))
 
-    text = STAT_FONT.render("GEN " + str(gen-1), 1, (255, 255, 255))
+    text = STAT_FONT.render("GEN  " + str(gen - 1), 1, (255, 255, 255))
     win.blit(text, (10, 10))
 
-    text = STAT_FONT.render("ALIVE " + str(len(birds)), 1, (255, 255, 255))
+    text = STAT_FONT.render("ALIVE  " + str(len(birds)), 1, (255, 255, 255))
     win.blit(text, (10, 50))
 
     pygame.display.update()
@@ -199,9 +199,9 @@ def eval_genomes(genomes, config):
     win = WIN
     gen += 1
 
-
     for _, g in genomes:
         g.fitness = 0
+        # For each bird/Genome, create a new network
         net = neat.nn.FeedForwardNetwork.create(g, config)
         nets.append(net)
         birds.append(Bird(230, 350))
@@ -214,7 +214,6 @@ def eval_genomes(genomes, config):
     if base == None or birds == None or pipes == None:
         print("something not inited")
 
-    #win = pygame.display.set_mode((WIN_WIDTH, WIN_HEIGHT))
     clock = pygame.time.Clock()
 
     run = True
@@ -240,7 +239,9 @@ def eval_genomes(genomes, config):
             bird.move()
             ge[x].fitness += 0.1
 
-            output = nets[x].activate((bird.y, abs(bird.y - pipes[pipe_ind].height), abs(bird.y - pipes[pipe_ind].bottom)))
+            # output = net.activate(inputs)
+            output = nets[x].activate(
+                (bird.y, abs(bird.y - pipes[pipe_ind].height), abs(bird.y - pipes[pipe_ind].bottom)))
 
             # Since one op neuron
             if output[0] > 0.5:
@@ -254,7 +255,9 @@ def eval_genomes(genomes, config):
         for pipe in pipes:
             for x, bird in enumerate(birds):
 
+                # Reduce fitness by 1 if bird collies
                 if pipe.collide(bird):
+
                     ge[x].fitness -= 1
                     birds.pop(x)
                     nets.pop(x)
@@ -271,6 +274,7 @@ def eval_genomes(genomes, config):
 
         if add_pipe:
             score += 1
+            # Increase fitness for score
             for g in ge:
                 g.fitness += 5
 
@@ -281,7 +285,7 @@ def eval_genomes(genomes, config):
 
         for x, bird in enumerate(birds):
 
-            if bird.y + bird.img.get_height() -10 >= FLOOR or bird.y < -50:
+            if bird.y + bird.img.get_height() - 10 >= FLOOR or bird.y < -50:
                 birds.pop(x)
                 nets.pop(x)
                 ge.pop(x)
@@ -306,7 +310,6 @@ def run(config_file):
 
 
 if __name__ == '__main__':
-
     local_dir = os.path.dirname(__file__)
     config_path = os.path.join(local_dir, 'config-feedforward.txt')
     run(config_path)
