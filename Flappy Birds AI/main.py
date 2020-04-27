@@ -191,9 +191,9 @@ def draw_window(win, birds, pipes, base, score):
 
 
 def eval_genomes(genomes, config):
-    nets = []
-    ge = []
-    birds = []
+    nets = []   # Neural nets for all the birds
+    ge = []     # The bird neat variable with all the fitness and shit
+    birds = []  # The bird object
 
     global WIN, gen
     win = WIN
@@ -228,6 +228,8 @@ def eval_genomes(genomes, config):
                 break
 
         pipe_ind = 0
+
+
         if len(birds) > 0:
             if len(pipes) > 1 and birds[0].x > pipes[0].x + pipes[0].PIPE_TOP.get_width():
                 pipe_ind = 1
